@@ -9,3 +9,5 @@ LCL编译器开发组现有两名成员, 开发进度为刚开始写功能.
 ### info
 邮箱: [The_Magic_Flute@outlook.com](mailto:The_Magic_Flute@outlook.com?subject=about%20LCLang&body=我想加入LCL的编译器开发组,%20这是我的个人信息:%20%0aGitHub主页:%20%0aQQ:%20)
 （邮件正文已包含在mailto链接中，单击链接后填写个人信息即可发送）
+
+本项目主页: [https://github.com/TheMagicFlute/LCL](https://github.com/TheMagicFlute/LCL)
