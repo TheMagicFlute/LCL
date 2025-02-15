@@ -5,43 +5,66 @@
 #define VERSION "v0.0.1"
 #define PLATFORM "pc-windows-g++"
 #define COMPILE_TIME __TIMESTAMP__
-// #define GIT_COMMIT "12345678"
 
-// include standard libraries
+// Standard libraries
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <fstream>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
 
-// define functions
+// Constants header
+#include "./constants.h"
+
+// Function declarations
+void logMessage(const std::string &message);
+std::string getCurrentTime();
 void displayVersion();
 void printUsage();
-inline std::string parseNextArgument();
+std::string parseNextArgument();
+void printWARN(const std::string &message);
+void printERR(const std::string &message);
+bool hasFileExtension(const std::string &filename);
+std::string getFileName(const std::string &filename);
+std::string getFileExtension(const std::string &filename);
+bool isFile(const std::string &filename);
 
-inline void printWARN(const std::string message);
-inline void printERR(const std::string message);
+// Global variables
+extern int currentArgumentIndex;
+extern int mode;
+extern std::string inputFileName;
+extern std::string outputFileName;
 
-inline bool hasFileExtension(const std::string filename);
-std::string getFileName(std::string filename);
-std::string getFileExtension(std::string filename);
-
-// define global variables
-int currentArgumentIndex = 0;
-std::string inputFileName = "";
-std::string outputFileName = "";
-
-// define colors of output text
-const std::string RED = "\033[31m";
-const std::string GREEN = "\033[32m";
-const std::string YELLOW = "\033[33m";
-const std::string BLUE = "\033[34m";
-const std::string MAGENTA = "\033[35m";
-const std::string CYAN = "\033[36m";
-const std::string RESET = "\033[0m";
-
-// realisation of functions
 /**
- * Print the usage message
+ * @brief Log a message to the console if the debug mode is enabled.
+ * @param message The message to log.
+ */
+inline void logMessage(const std::string &message)
+{
+    if (mode == DEBUG_MODE)
+    {
+        std::cout << CYAN << "DEBUG " << getCurrentTime() << " " << message << RESET << "\n";
+    }
+}
+
+/**
+ * @brief Get the current time as a string in the format "HH:MM:SS".
+ * @return The current time as a string.
+ */
+inline std::string getCurrentTime()
+{
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::tm *local_time = std::localtime(&now_time);
+    std::ostringstream oss;
+    oss << std::put_time(local_time, "%H:%M:%S");
+    return oss.str();
+}
+
+/**
+ * @brief Print the usage message.
  */
 void printUsage()
 {
@@ -50,69 +73,65 @@ void printUsage()
     std::cout << "  -h, --help       Show this help message\n";
     std::cout << "  -v, --version    Show version information\n";
     std::cout << "  -o, --output     Custom output file name\n";
-    return;
 }
 
 /**
- * Display the version information
+ * @brief Print an error message.
+ * @param message The message to print.
+ */
+inline void printERR(const std::string &message)
+{
+    std::cout << PROGRAM_NAME << ": ";
+    std::cout << RED << "ERROR: " << RESET;
+    std::cout << message << std::endl;
+}
+
+/**
+ * @brief Display the version information.
  */
 void displayVersion()
 {
     std::cout << PROGRAM_NAME << " " << VERSION << " for " << PLATFORM << "\n";
     std::cout << "Built on " << COMPILE_TIME << "\n";
-    return;
 }
 
 /**
- * Parse the next command line argument
- * @return the next argument
+ * @brief Parse the next command line argument.
+ * @return The next argument.
  */
 inline std::string parseNextArgument()
 {
+    logMessage("currentArgumentIndex: " + std::to_string(currentArgumentIndex));
     return __argv[currentArgumentIndex++];
 }
 
 /**
- * Print a warning message
- * @param message the message to print
+ * @brief Print a warning message.
+ * @param message The message to print.
  */
-inline void printWARN(const std::string message)
+inline void printWARN(const std::string &message)
 {
     std::cout << PROGRAM_NAME << ": ";
-    std::cout << YELLOW << "Warning: " << RESET;
+    std::cout << YELLOW << "WARNING: " << RESET;
     std::cout << message << std::endl;
-    return;
 }
 
 /**
- * Print an error message
- * @param message the message to print
+ * @brief Check if a file has an extension.
+ * @param filename The name of the file.
+ * @return True if the file has an extension.
  */
-inline void printERR(const std::string message)
+inline bool hasFileExtension(const std::string &filename)
 {
-    std::cout << PROGRAM_NAME << ": ";
-    std::cout << RED << "Error: " << RESET;
-    std::cout << message << std::endl;
-    return;
+    return filename.find_last_of(".") != std::string::npos && filename.find_last_of(".") != filename.size() - 1;
 }
 
 /**
- * Check if a file has an extension
- * @param filename the name of the file
- * @return true if the file has an extension
+ * @brief Get the file name from a path.
+ * @param filename The name of the file.
+ * @return The file name.
  */
-
-inline bool hasFileExtension(const std::string filename)
-{
-    return filename.find_last_of(".") != std::string::npos;
-}
-
-/**
- * Get the file name from a path
- * @param filename the name of the file
- * @return the file name
- */
-std::string getFileName(std::string filename)
+std::string getFileName(const std::string &filename)
 {
     if (hasFileExtension(filename))
     {
@@ -123,28 +142,41 @@ std::string getFileName(std::string filename)
 }
 
 /**
- * Get the file extension from a path
- * @param filename the name of the file
- * @return the file extension
+ * @brief Get the file extension from a path.
+ * @param filename The name of the file.
+ * @return The file extension.
  */
-std::string getFileExtension(std::string filename)
+std::string getFileExtension(const std::string &filename)
 {
     size_t pos;
     if (hasFileExtension(filename))
     {
         pos = filename.find_last_of(".");
-        filename = filename.substr(pos + 1);
+        return filename.substr(pos + 1);
     }
     else
     {
         pos = filename.find_last_of("/\\");
         if (pos != std::string::npos)
         {
-            filename = filename.substr(pos + 1);
+            return filename.substr(pos + 1);
         }
     }
     return filename;
 }
 
+/**
+ * @brief Check if a file exists.
+ * @param filename The name of the file.
+ * @return True if the file exists, false otherwise.
+ */
+bool isFile(const std::string &filename)
+{
+    if (hasFileExtension(filename) && filename.substr(0, filename.find_last_of(".")) != "")
+    {
+        return true;
+    }
+    return false;
+}
 
 #endif // LCL_H
