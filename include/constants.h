@@ -18,8 +18,8 @@ const std::string CYAN = "\033[36m";
 const std::string RESET = "\033[0m";
 
 // Special codes
-const int ERR_CODE = -1;
-const int END_CODE = 0;
+const int ERROR_EXIT_CODE = -1;
+const int NORMAL_EXIT_CODE = 0;
 
 // Modes
 const int NORMAL_MODE = 0;
