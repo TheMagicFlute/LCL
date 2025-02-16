@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     if (argc == 1)
     {
         printUsage();
-        return ERR_CODE;
+        return ERROR_EXIT_CODE;
     }
     inputFileName = parseNextArgument();
     outputFileName = getFileName(inputFileName) + ".cpp";
@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
         if (arg == "-h" || arg == "--help")
         {
             printUsage();
-            return END_CODE;
+            return NORMAL_EXIT_CODE;
         }
         else if (arg == "-v" || arg == "--version")
         {
             displayVersion();
-            return END_CODE;
+            return NORMAL_EXIT_CODE;
         }
         else if (arg == "-o" || arg == "--output")
         {
@@ -39,21 +39,21 @@ int main(int argc, char *argv[])
                 {
                     printERR("The filename '" + outputFileName + "' is invalid.");
                     printUsage();
-                    return ERR_CODE;
+                    return ERROR_EXIT_CODE;
                 }
             }
             else
             {
                 printERR("Missing output file name.");
-                return ERR_CODE;
+                return ERROR_EXIT_CODE;
             }
         }
         else
         {
             printERR("Unrecognized command-line argument: '" + arg + "'.");
             printUsage();
-            return ERR_CODE;
+            return ERROR_EXIT_CODE;
         }
     }
-    return END_CODE;
+    return NORMAL_EXIT_CODE;
 }
